@@ -1,5 +1,6 @@
-# dartmanmusicplayer
+# Dartman Music Player
 
+A retro music player made in Flutter!
 Project for #Hack20 Global Flutter Hackathon
 
 ## Getting Started
