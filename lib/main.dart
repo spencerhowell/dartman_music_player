@@ -1,6 +1,10 @@
-import 'package:dartmanmusicplayer/sidebutton.dart';
+import 'package:assets_audio_player/assets_audio_player.dart';
+import 'package:dartmanmusicplayer/side_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_audio_query/flutter_audio_query.dart';
+
+import 'music_list.dart';
 
 void main() {
   runApp(MyApp());
@@ -28,13 +32,13 @@ class MyApp extends StatelessWidget {
         // closer together (more dense) than on mobile platforms.
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+  MyHomePage({Key key}) : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -45,15 +49,35 @@ class MyHomePage extends StatefulWidget {
   // used by the build method of the State. Fields in a Widget subclass are
   // always marked "final".
 
-  final String title;
+  final FlutterAudioQuery audioQuery = FlutterAudioQuery();
+  final audioPlayer = AssetsAudioPlayer.newPlayer();
+  final dartmanBlue = Colors.blue[300];
+  final dartmanGray = Colors.blueGrey[200];
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final dartmanBlue = Colors.blue[300];
-  final dartmanGray = Colors.blueGrey[200];
+  AlbumInfo _album;
+  List<SongInfo> _songList;
+
+  _updateAlbum() async {
+    _songList = await widget.audioQuery.getSongsFromAlbum(albumId: _album.id.toString());
+    //Todo start playing music
+  }
+
+  _ejectPressed() async {
+    //TODO stop playing music
+    var selectedAlbum = await Navigator.push(
+        context, MaterialPageRoute(builder: (context) => MusicList()));
+
+    if (selectedAlbum != null) {
+      setState(() {
+        _album = selectedAlbum;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +89,7 @@ class _MyHomePageState extends State<MyHomePage> {
           Expanded(
             child: Container(
               decoration: BoxDecoration(
-                color: dartmanBlue,
+                color: widget.dartmanBlue,
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.max,
@@ -116,7 +140,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           Container(
             decoration: BoxDecoration(
-              color: dartmanGray,
+              color: widget.dartmanGray,
             ),
             width: 100.0,
             child: Column(
@@ -131,7 +155,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 SizedBox(height: 16.0),
                 SideButton(icon: Icons.fast_rewind),
                 SizedBox(height: 16.0),
-                SideButton(text: "EJECT"),
+                SideButton(text: "EJECT", onPressed: () => _ejectPressed()),
               ],
             ),
           ),

@@ -4,10 +4,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class SideButton extends StatefulWidget {
-  SideButton({Key key, this.icon, this.text}) : super(key: key);
+  SideButton({Key key, this.icon, this.text, this.onPressed}) : super(key: key);
 
   final IconData icon;
   final String text;
+  final VoidCallback onPressed;
 
   @override
   _SideButtonState createState() => _SideButtonState();
@@ -53,13 +54,9 @@ class _SideButtonState extends State<SideButton> {
       onTap: () => {
         setState(() {
           _isPressed = !_isPressed;
+          if (widget.onPressed != null) widget.onPressed();
         })
       },
     );
   }
-}
-
-enum ButtonState {
-  down,
-  up,
 }
