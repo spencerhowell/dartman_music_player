@@ -62,21 +62,36 @@ class _MyHomePageState extends State<MyHomePage> {
   AlbumInfo _album;
   List<SongInfo> _songList;
 
-  _updateAlbum() async {
-    _songList = await widget.audioQuery.getSongsFromAlbum(albumId: _album.id.toString());
-    //Todo start playing music
+  _updateAlbum(AlbumInfo albumInfo) async {
+    var songs = await widget.audioQuery.getSongsFromAlbum(albumId: albumInfo.id.toString());
+
+    var songAudios = songs.map((songInfo) => Audio.file(Uri.file(songInfo.filePath.toString()).toString())).toList();
+    widget.audioPlayer.open(
+      Playlist(
+        audios: songAudios
+      )
+    );
+
+    setState(() {
+      _album = albumInfo;
+      _songList = songs;
+      widget.audioPlayer.play();
+    });
   }
 
   _ejectPressed() async {
-    //TODO stop playing music
     var selectedAlbum = await Navigator.push(
         context, MaterialPageRoute(builder: (context) => MusicList()));
 
     if (selectedAlbum != null) {
-      setState(() {
-        _album = selectedAlbum;
-      });
+      _updateAlbum(selectedAlbum);
     }
+  }
+
+  @override
+  void dispose() {
+    widget.audioPlayer.dispose();
+    super.dispose();
   }
 
   @override
