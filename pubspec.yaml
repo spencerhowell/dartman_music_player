@@ -83,3 +83,6 @@ flutter:
     - family: RobotoSlab
       fonts:
         - asset: fonts/RobotoSlab-Medium.ttf
+    - family: PermanentMarker
+      fonts:
+        - asset: fonts/PermanentMarker-Regular.ttf

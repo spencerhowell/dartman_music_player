@@ -88,6 +88,22 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  _playPressed() {
+    widget.audioPlayer.play();
+  }
+
+  _stopPressed() {
+    widget.audioPlayer.pause();
+  }
+
+  _rewindPressed() {
+    widget.audioPlayer.previous();
+  }
+
+  _fastForwardPressed() {
+    widget.audioPlayer.next();
+  }
+
   @override
   void dispose() {
     widget.audioPlayer.dispose();
@@ -135,7 +151,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     height: 350.0,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(16.0)),
-                      color: Colors.black,
+                      color: Colors.grey[900],
                     ),
                   ),
                   Spacer(),
@@ -162,13 +178,13 @@ class _MyHomePageState extends State<MyHomePage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SizedBox(height: 85.0),
-                SideButton(icon: Icons.play_arrow),
+                SideButton(icon: Icons.play_arrow, onPressed: () => _playPressed()),
                 SizedBox(height: 16.0),
-                SideButton(icon: Icons.stop),
+                SideButton(icon: Icons.stop, onPressed: () => _stopPressed()),
                 SizedBox(height: 16.0),
-                SideButton(icon: Icons.fast_forward),
+                SideButton(icon: Icons.fast_forward, onPressed: () => _fastForwardPressed()),
                 SizedBox(height: 16.0),
-                SideButton(icon: Icons.fast_rewind),
+                SideButton(icon: Icons.fast_rewind, onPressed: () => _rewindPressed()),
                 SizedBox(height: 16.0),
                 SideButton(text: "EJECT", onPressed: () => _ejectPressed()),
               ],
@@ -179,3 +195,4 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
+

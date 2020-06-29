@@ -34,6 +34,8 @@ class _SideButtonState extends State<SideButton> {
           color: contentColor,
         ),
       );
+    } else {
+      return Container();
     }
   }
 
