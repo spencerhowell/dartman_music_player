@@ -1,5 +1,8 @@
+import 'dart:math';
+
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:dartmanmusicplayer/side_button.dart';
+import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_audio_query/flutter_audio_query.dart';
@@ -51,7 +54,7 @@ class MyHomePage extends StatefulWidget {
 
   final FlutterAudioQuery audioQuery = FlutterAudioQuery();
   final audioPlayer = AssetsAudioPlayer.newPlayer();
-  final dartmanBlue = Colors.blue[300];
+  final dartmanBlue = Colors.blue[600];
   final dartmanGray = Colors.blueGrey[200];
 
   @override
@@ -61,21 +64,23 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   AlbumInfo _album;
   List<SongInfo> _songList;
+  bool _isPaused = true;
 
   _updateAlbum(AlbumInfo albumInfo) async {
-    var songs = await widget.audioQuery.getSongsFromAlbum(albumId: albumInfo.id.toString());
+    var songs = await widget.audioQuery
+        .getSongsFromAlbum(albumId: albumInfo.id.toString());
 
-    var songAudios = songs.map((songInfo) => Audio.file(Uri.file(songInfo.filePath.toString()).toString())).toList();
-    widget.audioPlayer.open(
-      Playlist(
-        audios: songAudios
-      )
-    );
+    var songAudios = songs
+        .map((songInfo) =>
+            Audio.file(Uri.file(songInfo.filePath.toString()).toString()))
+        .toList();
+    widget.audioPlayer.open(Playlist(audios: songAudios));
 
     setState(() {
       _album = albumInfo;
       _songList = songs;
       widget.audioPlayer.play();
+      _isPaused = false;
     });
   }
 
@@ -90,18 +95,30 @@ class _MyHomePageState extends State<MyHomePage> {
 
   _playPressed() {
     widget.audioPlayer.play();
+    setState(() {
+      _isPaused = false;
+    });
   }
 
   _stopPressed() {
     widget.audioPlayer.pause();
+    setState(() {
+      _isPaused = true;
+    });
   }
 
   _rewindPressed() {
     widget.audioPlayer.previous();
+    setState(() {
+      _isPaused = false;
+    });
   }
 
   _fastForwardPressed() {
     widget.audioPlayer.next();
+    setState(() {
+      _isPaused = false;
+    });
   }
 
   @override
@@ -140,18 +157,33 @@ class _MyHomePageState extends State<MyHomePage> {
                         textAlign: TextAlign.left,
                         style: TextStyle(
                           fontSize: 40.0,
-                          color: Colors.blueGrey[100],
+                          color: Colors.white,
+                          //color: Colors.blueGrey[100],
                           fontFamily: 'RobotoSlab',
                         )),
                   ),
                   Spacer(),
                   Container(
-                    margin: EdgeInsets.symmetric(horizontal: 50.0),
-                    width: 150.0,
-                    height: 350.0,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(16.0)),
-                      color: Colors.grey[900],
+                    height: 375,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        SizedBox(width: 20.0,),
+                        Expanded(
+                          child: FlareActor(
+                            'assets/cassette.flr',
+                            fit: BoxFit.contain,
+                            animation: 'Roll',
+                            isPaused: _isPaused,
+                          ),
+                        ),
+                        Container(
+                          //margin: EdgeInsets.symmetric(horizontal: 30.0),
+                          width: 40,
+                          child: Image.asset('assets/arrow.png', width: 50),
+                        ),
+                        SizedBox(width: 30.0,)
+                      ],
                     ),
                   ),
                   Spacer(),
@@ -161,7 +193,8 @@ class _MyHomePageState extends State<MyHomePage> {
                         textAlign: TextAlign.left,
                         style: TextStyle(
                             fontSize: 40.0,
-                            color: Colors.blueGrey[100],
+                            color: Colors.white,
+                            //color: Colors.blueGrey[100],
                             fontFamily: 'MuseoModerno')),
                   ),
                   SizedBox(height: 20.0),
@@ -178,13 +211,17 @@ class _MyHomePageState extends State<MyHomePage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SizedBox(height: 85.0),
-                SideButton(icon: Icons.play_arrow, onPressed: () => _playPressed()),
+                SideButton(
+                    icon: Icons.play_arrow, onPressed: () => _playPressed()),
                 SizedBox(height: 16.0),
                 SideButton(icon: Icons.stop, onPressed: () => _stopPressed()),
                 SizedBox(height: 16.0),
-                SideButton(icon: Icons.fast_forward, onPressed: () => _fastForwardPressed()),
+                SideButton(
+                    icon: Icons.fast_forward,
+                    onPressed: () => _fastForwardPressed()),
                 SizedBox(height: 16.0),
-                SideButton(icon: Icons.fast_rewind, onPressed: () => _rewindPressed()),
+                SideButton(
+                    icon: Icons.fast_rewind, onPressed: () => _rewindPressed()),
                 SizedBox(height: 16.0),
                 SideButton(text: "EJECT", onPressed: () => _ejectPressed()),
               ],
@@ -195,4 +232,3 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
-
