@@ -38,6 +38,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   bool _isPaused = true;
+  var buttonState = ButtonStates();
 
   _updateAlbum(AlbumInfo albumInfo) async {
     var songs = await widget.audioQuery
@@ -52,14 +53,18 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       widget.audioPlayer.play();
       _isPaused = false;
+      buttonState.playPressed = true;
+      buttonState.stopPressed = false;
+      buttonState.ejectPressed = false;
     });
   }
 
   _ejectPressed() async {
+    setState(() {
+      buttonState.ejectPressed = true;
+    });
     widget.audioPlayer.pause();
-    AssetsAudioPlayer.playAndForget(
-      Audio('assets/tape-sfx.mp3')
-    );
+    AssetsAudioPlayer.playAndForget(Audio('assets/tape-sfx.mp3'));
     var selectedAlbum = await Navigator.push(
         context, MaterialPageRoute(builder: (context) => MusicList()));
 
@@ -75,9 +80,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   _playSeekSfx() {
-    AssetsAudioPlayer.playAndForget(
-      Audio('assets/ffwd-sfx.mp3')
-    );
+    AssetsAudioPlayer.playAndForget(Audio('assets/ffwd-sfx.mp3'));
   }
 
   _playPressed() {
@@ -85,6 +88,8 @@ class _MyHomePageState extends State<MyHomePage> {
     widget.audioPlayer.play();
     setState(() {
       _isPaused = false;
+      buttonState.playPressed = true;
+      buttonState.stopPressed = false;
     });
   }
 
@@ -93,6 +98,8 @@ class _MyHomePageState extends State<MyHomePage> {
     _playButtonSfx();
     setState(() {
       _isPaused = true;
+      buttonState.stopPressed = true;
+      buttonState.playPressed = false;
     });
   }
 
@@ -102,6 +109,8 @@ class _MyHomePageState extends State<MyHomePage> {
     _playSeekSfx();
     setState(() {
       _isPaused = false;
+      buttonState.stopPressed = false;
+      buttonState.playPressed = true;
     });
   }
 
@@ -111,6 +120,8 @@ class _MyHomePageState extends State<MyHomePage> {
     _playSeekSfx();
     setState(() {
       _isPaused = false;
+      buttonState.stopPressed = false;
+      buttonState.playPressed = true;
     });
   }
 
@@ -162,7 +173,9 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        SizedBox(width: 20.0,),
+                        SizedBox(
+                          width: 20.0,
+                        ),
                         Expanded(
                           child: FlareActor(
                             'assets/cassette.flr',
@@ -176,7 +189,9 @@ class _MyHomePageState extends State<MyHomePage> {
                           width: 40,
                           child: Image.asset('assets/arrow.png', width: 50),
                         ),
-                        SizedBox(width: 30.0,)
+                        SizedBox(
+                          width: 30.0,
+                        )
                       ],
                     ),
                   ),
@@ -206,18 +221,34 @@ class _MyHomePageState extends State<MyHomePage> {
               children: [
                 SizedBox(height: 85.0),
                 SideButton(
-                    icon: Icons.play_arrow, onPressed: () => _playPressed()),
-                SizedBox(height: 16.0),
-                SideButton(icon: Icons.stop, onPressed: () => _stopPressed()),
-                SizedBox(height: 16.0),
-                SideButton(
-                    icon: Icons.fast_forward,
-                    onPressed: () => _fastForwardPressed()),
+                  icon: Icons.play_arrow,
+                  onPressed: () => _playPressed(),
+                  isPressed: buttonState.playPressed,
+                ),
                 SizedBox(height: 16.0),
                 SideButton(
-                    icon: Icons.fast_rewind, onPressed: () => _rewindPressed()),
+                  icon: Icons.stop,
+                  onPressed: () => _stopPressed(),
+                  isPressed: buttonState.stopPressed,
+                ),
                 SizedBox(height: 16.0),
-                SideButton(text: "EJECT", onPressed: () => _ejectPressed()),
+                SideButton(
+                  icon: Icons.fast_forward,
+                  isPressed: buttonState.fastForwardPressed,
+                  onPressed: () => _fastForwardPressed(),
+                ),
+                SizedBox(height: 16.0),
+                SideButton(
+                  icon: Icons.fast_rewind,
+                  onPressed: () => _rewindPressed(),
+                  isPressed: buttonState.rewindPressed,
+                ),
+                SizedBox(height: 16.0),
+                SideButton(
+                  text: "EJECT",
+                  onPressed: () => _ejectPressed(),
+                  isPressed: buttonState.ejectPressed,
+                ),
               ],
             ),
           ),
@@ -225,4 +256,12 @@ class _MyHomePageState extends State<MyHomePage> {
       )),
     );
   }
+}
+
+class ButtonStates {
+  bool playPressed = false;
+  bool stopPressed = false;
+  bool fastForwardPressed = false;
+  bool rewindPressed = false;
+  bool ejectPressed = false;
 }
