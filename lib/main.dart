@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:dartmanmusicplayer/side_button.dart';
 import 'package:flare_flutter/flare_actor.dart';
@@ -14,25 +12,12 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
         primarySwatch: Colors.blue,
-        // This makes the visual density adapt to the platform that you run
-        // the app on. For desktop platforms, the controls will be smaller and
-        // closer together (more dense) than on mobile platforms.
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: MyHomePage(),
@@ -41,19 +26,9 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
   final FlutterAudioQuery audioQuery = FlutterAudioQuery();
   final audioPlayer = AssetsAudioPlayer.newPlayer();
+  final sfxPlayer = AssetsAudioPlayer.newPlayer();
   final dartmanBlue = Colors.blue[600];
   final dartmanGray = Colors.blueGrey[200];
 
@@ -62,8 +37,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  AlbumInfo _album;
-  List<SongInfo> _songList;
   bool _isPaused = true;
 
   _updateAlbum(AlbumInfo albumInfo) async {
@@ -77,14 +50,16 @@ class _MyHomePageState extends State<MyHomePage> {
     widget.audioPlayer.open(Playlist(audios: songAudios));
 
     setState(() {
-      _album = albumInfo;
-      _songList = songs;
       widget.audioPlayer.play();
       _isPaused = false;
     });
   }
 
   _ejectPressed() async {
+    widget.audioPlayer.pause();
+    AssetsAudioPlayer.playAndForget(
+      Audio('assets/tape-sfx.mp3')
+    );
     var selectedAlbum = await Navigator.push(
         context, MaterialPageRoute(builder: (context) => MusicList()));
 
@@ -93,7 +68,20 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  _playButtonSfx() {
+    AssetsAudioPlayer.playAndForget(
+      Audio('assets/button-sfx.mp3'),
+    );
+  }
+
+  _playSeekSfx() {
+    AssetsAudioPlayer.playAndForget(
+      Audio('assets/ffwd-sfx.mp3')
+    );
+  }
+
   _playPressed() {
+    _playButtonSfx();
     widget.audioPlayer.play();
     setState(() {
       _isPaused = false;
@@ -102,6 +90,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   _stopPressed() {
     widget.audioPlayer.pause();
+    _playButtonSfx();
     setState(() {
       _isPaused = true;
     });
@@ -109,6 +98,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   _rewindPressed() {
     widget.audioPlayer.previous();
+    _playButtonSfx();
+    _playSeekSfx();
     setState(() {
       _isPaused = false;
     });
@@ -116,6 +107,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   _fastForwardPressed() {
     widget.audioPlayer.next();
+    _playButtonSfx();
+    _playSeekSfx();
     setState(() {
       _isPaused = false;
     });
@@ -124,6 +117,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void dispose() {
     widget.audioPlayer.dispose();
+    widget.sfxPlayer.dispose();
     super.dispose();
   }
 

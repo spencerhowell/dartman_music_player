@@ -63,7 +63,7 @@ class MusicListState extends State<MusicList> {
     return Scaffold(
       appBar: new AppBar(
         title: Text("Cassette Tapes"),
-        backgroundColor: Colors.blue[300],
+        backgroundColor: Colors.blue[600],
       ),
      body: FutureBuilder<List<AlbumInfo>>(
        future: widget.audioQuery.getAlbums(),

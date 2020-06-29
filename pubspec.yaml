@@ -54,6 +54,9 @@ flutter:
   assets:
     - assets/cassette.flr
     - assets/arrow.png
+    - assets/button-sfx.mp3
+    - assets/ffwd-sfx.mp3
+    - assets/tape-sfx.mp3
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
